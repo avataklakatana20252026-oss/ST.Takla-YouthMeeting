@@ -1,13 +1,17 @@
-plugins { id 'com.android.application' }
+
+plugins {
+    id 'com.android.application'
+}
 
 android {
     namespace 'org.tekla.jesusprayer'
     compileSdk 35
+
     defaultConfig {
         applicationId 'org.tekla.jesusprayer'
         minSdk 23
-        targetSdk 28
-        versionCode 5
-        versionName '5.0'
+        targetSdk 35
+        versionCode 6
+        versionName '6.0'
     }
 }
