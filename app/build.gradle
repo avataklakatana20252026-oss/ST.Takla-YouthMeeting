@@ -7,7 +7,7 @@ android {
         applicationId 'org.tekla.jesusprayer'
         minSdk 23
         targetSdk 28
-        versionCode 1
-        versionName '1.0'
+        versionCode 5
+        versionName '5.0'
     }
 }
