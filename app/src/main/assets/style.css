@@ -93,3 +93,20 @@ html,body{height:100%;overflow:hidden}body{font-family:system-ui,'Noto Sans Arab
 .fast-progress{background:linear-gradient(145deg,#fffdfa,#f8f0e7);border:1px solid #e6d6c5;border-radius:20px;padding:17px;margin:14px 0 18px;color:#742c44}.fast-progress-head,.fast-progress-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}.fast-progress-head h2{font-size:17px;margin:4px 0 12px}.fast-progress-head small,.fast-progress-foot{font-size:11px;color:#79676a}.fast-progress-head strong{font-size:30px;font-variant-numeric:tabular-nums}.fast-progress-track{height:9px;border-radius:99px;background:#e9ddd4;overflow:hidden;margin:8px 0 12px}.fast-progress-track>div{height:100%;background:linear-gradient(90deg,#b38d55,#742c44);border-radius:99px;transition:width .35s ease}.fast-success{text-align:center}.fast-success-icon{margin:0 auto 12px;width:62px;height:62px;display:grid;place-items:center;border-radius:50%;background:#f1e5d3;color:#742c44;font-size:32px;animation:fastPop .3s ease}.fast-success p{line-height:1.9;color:#59444a}.fast-success .btn{width:100%}@keyframes fastPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}@media(prefers-reduced-motion:reduce){.fast-success-icon{animation:none}.fast-progress-track>div{transition:none}}
 
 .agpeya-head{color:var(--wine);padding:4px 0 10px}.agpeya-head h1{font-size:23px;margin:3px 0}.agpeya-progress{display:flex;gap:12px;align-items:center;font-size:12px;color:var(--wine)}.agpeya-progress>div{height:5px;background:#e9ddd4;flex:1;border-radius:99px;overflow:hidden}.agpeya-progress i{display:block;height:100%;background:var(--gold)}.agpeya-paper{min-height:44vh;touch-action:pan-y;animation:agpIn .18s ease}.agpeya-nav{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;background:var(--bg)}.agpeya-nav span{font-size:12px;color:var(--wine)}.agpeya-nav button:disabled{opacity:.35}@keyframes agpIn{from{opacity:.5;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+/* V18: compact prayer reader; content takes available viewport */
+main[data-screen=agpeya]{display:flex;flex-direction:column;overflow:hidden;padding:7px 10px 5px;gap:5px}
+main[data-screen=agpeya] .agpeya-compact{display:grid;grid-template-columns:36px minmax(0,1fr);align-items:center;gap:4px 6px;flex:none}
+.agpeya-compact .label{font-size:10px;margin:0;color:var(--muted)}
+.agpeya-compact .field{height:32px;min-height:32px;padding:3px 8px;font-size:12px;border-radius:8px}
+main[data-screen=agpeya] .reader-tools{position:static;flex:none;margin:0;padding:0;gap:5px}
+main[data-screen=agpeya] .reader-tools .btn{min-height:30px;padding:3px 10px;font-size:11px;border-radius:8px}
+main[data-screen=agpeya] .agpeya-progress{flex:none;font-size:10px;gap:6px}
+main[data-screen=agpeya] .agpeya-paper{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;margin:0;padding:9px 12px;border-radius:12px}
+.agpeya-paper h2{font-size:15px;margin:0 0 6px;padding-bottom:5px}
+main[data-screen=agpeya] .agpeya-nav{position:static;flex:none;padding:0;gap:6px}
+main[data-screen=agpeya] .agpeya-nav .btn,main[data-screen=agpeya] > .btn{min-height:32px;padding:4px 14px;font-size:12px;border-radius:8px}
+body:has(main[data-screen=agpeya]) .topbar{height:48px;min-height:48px;padding:4px 12px}
+body:has(main[data-screen=agpeya]) .topbar .icon-btn{width:34px;height:34px}
+body:has(main[data-screen=agpeya]) .topbrand strong{font-size:16px}
+body:has(main[data-screen=agpeya]) .topbrand span{display:none}
