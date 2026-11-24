@@ -26,6 +26,7 @@ public class NotificationReceiver extends BroadcastReceiver {
    String today=new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date());
    JSONObject current=acts.optJSONObject(today);if(current==null)current=new JSONObject();
    int kind=intent.getIntExtra("kind",103);
+   if(kind==106||kind==107){if(settings.optBoolean("fastReminder",true))fastNotice(c,today,kind);return;}
    boolean agpeya=any(current,new String[]{"prime","third","sixth","ninth","sunset","sleep","midnight"});
    if(kind==105){if(settings.optBoolean("dailyVerse",true)&&!today.equals(c.getSharedPreferences("notety_data",Context.MODE_PRIVATE).getString("lastOpeningVerseNotice","")))send(c,"رسالة ربنا ليك النهارده †","آية ورسالة النهارده مستنياك في نوتتي الروحية.",801);return;}
    if(kind==101||kind==102||kind==104){if(!settings.optBoolean("prayerReminders",true))return;
@@ -53,13 +54,22 @@ public class NotificationReceiver extends BroadcastReceiver {
    if(!reminders.isEmpty())send(c,"تذكيراتي الروحية †","مش متسجّل عندك مؤخرًا: "+android.text.TextUtils.join("، ",reminders)+". تقدر تبدأ بخطوة صغيرة.",806);
   }catch(Exception ignored){}
  }
+ static void fastNotice(Context c,String date,int kind)throws Exception{
+  String period=kind==106?"morning":"evening";
+  java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+  try(java.io.InputStream in=c.getAssets().open("fast_notifications.json")){byte[] buffer=new byte[4096];int n;while((n=in.read(buffer))!=-1)bytes.write(buffer,0,n);}
+  JSONObject row=new JSONObject(bytes.toString("UTF-8")).optJSONObject(date);if(row==null)return;
+  String body=row.getString(period+"Message")+"\nقراءة اليوم: "+row.getString(period);
+  send(c,kind==106?"صوم الميلاد | قراءة الصباح":"صوم الميلاد | قراءة المساء",body,kind==106?906:907,date,period);
+ }
  static boolean any(JSONObject o,String[] keys){for(String k:keys)if(o.optBoolean(k))return true;return false;}
  static String lastDate(JSONObject days,String key){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();if(date.compareTo(new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date()))<=0&&date.compareTo(latest)>0&&days.optJSONObject(date)!=null&&days.optJSONObject(date).optBoolean(key))latest=date;}return latest;}
  static String lastAny(JSONObject days,String[] keys){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();JSONObject a=days.optJSONObject(date);if(date.compareTo(new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date()))<=0&&a!=null&&any(a,keys)&&date.compareTo(latest)>0)latest=date;}return latest;}
  static Calendar parse(String d){Calendar c=Calendar.getInstance();String[] x=d.split("-");if(x.length==3){c.set(Integer.parseInt(x[0]),Integer.parseInt(x[1])-1,Integer.parseInt(x[2]),0,0,0);c.set(Calendar.MILLISECOND,0);}return c;}
  static int days(String a,String b){return (int)Math.round((parse(b).getTimeInMillis()-parse(a).getTimeInMillis())/86400000.0);}
- static void send(Context c,String title,String body,int id){try{if(Build.VERSION.SDK_INT>=33&&c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)return;
-  Intent open=new Intent(c,MainActivity.class);open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);PendingIntent pi=PendingIntent.getActivity(c,id,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+ static void send(Context c,String title,String body,int id){send(c,title,body,id,null,null);}
+ static void send(Context c,String title,String body,int id,String date,String period){try{if(Build.VERSION.SDK_INT>=33&&c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)return;
+  Intent open=new Intent(c,MainActivity.class);if(period!=null){open.putExtra("fastPeriod",period);open.putExtra("fastDate",date);}open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);PendingIntent pi=PendingIntent.getActivity(c,id,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
   Notification.Builder b=Build.VERSION.SDK_INT>=26?new Notification.Builder(c,MainActivity.CHANNEL):new Notification.Builder(c);
   b.setSmallIcon(R.drawable.ic_notification).setContentTitle(title).setContentText(body).setStyle(new Notification.BigTextStyle().bigText(body)).setContentIntent(pi).setAutoCancel(true).setWhen(System.currentTimeMillis());
   ((NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE)).notify(id,b.build());

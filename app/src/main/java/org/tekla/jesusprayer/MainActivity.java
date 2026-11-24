@@ -27,10 +27,12 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(0xFFFAF7F2);getWindow().setNavigationBarColor(0xFFFAF7F2);
         if(Build.VERSION.SDK_INT>=26){getWindow().getDecorView().setSystemUiVisibility(0x00002000|0x00000010);NotificationChannel c=new NotificationChannel(CHANNEL,"تذكيراتي الروحية",NotificationManager.IMPORTANCE_DEFAULT);c.setDescription("رسالة اليوم والتنبيهات الروحية");getSystemService(NotificationManager.class).createNotificationChannel(c);}
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},29);
-        web=new WebView(this);web.setBackgroundColor(0xFFFAF7F2);web.setWebViewClient(new WebViewClient());web.setWebChromeClient(new WebChromeClient());
+        web=new WebView(this);web.setBackgroundColor(0xFFFAF7F2);web.setWebViewClient(new WebViewClient(){@Override public void onPageFinished(WebView v,String url){super.onPageFinished(v,url);openFastIntent();}});web.setWebChromeClient(new WebChromeClient());
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(true);s.setAllowFileAccessFromFileURLs(true);s.setAllowUniversalAccessFromFileURLs(false);s.setDefaultTextEncodingName("UTF-8");s.setTextZoom(100);
         web.addJavascriptInterface(new Bridge(),"Android");setContentView(web);web.loadUrl("file:///android_asset/index.html");scheduleAll(this);
     }
+    @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);openFastIntent();}
+    private void openFastIntent(){Intent i=getIntent();if(web==null||i==null)return;String period=i.getStringExtra("fastPeriod"),date=i.getStringExtra("fastDate");if(period==null||date==null||!date.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")||!(period.equals("morning")||period.equals("evening")))return;web.evaluateJavascript("if(typeof openFastNotice==='function'){openFastNotice("+JSONObject.quote(date)+","+JSONObject.quote(period)+");true}else{false}",result->{if("true".equals(result)){i.removeExtra("fastPeriod");i.removeExtra("fastDate");}});}
     public class Bridge {
         @JavascriptInterface public void finishApp(){runOnUiThread(()->finish());}
         @JavascriptInterface public void syncData(String json){getSharedPreferences("notety_data",MODE_PRIVATE).edit().putString("state",json).apply();}
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
     static void scheduleAll(Context c,boolean force){AlarmManager manager=(AlarmManager)c.getSystemService(Context.ALARM_SERVICE);if(manager==null)return;
         JSONObject prefs=null;try{JSONObject state=new JSONObject(c.getSharedPreferences("notety_data",Context.MODE_PRIVATE).getString("state","{}"));prefs=state.optJSONObject("settings");}catch(Exception ignored){}
         registerAlarm(c,manager,force,101,at(prefs,"primeTime","07:00"));registerAlarm(c,manager,force,102,at(prefs,"sunsetTime","18:00"));registerAlarm(c,manager,force,104,at(prefs,"sleepTime","22:00"));registerAlarm(c,manager,force,103,at(prefs,"reminderHour","21:00"));registerAlarm(c,manager,force,105,at(prefs,"verseTime","09:00"));
+        registerAlarm(c,manager,force,106,"11:00");registerAlarm(c,manager,force,107,"21:00");
     }
     private static String at(JSONObject prefs,String key,String def){return prefs==null?def:prefs.optString(key,def);}
     private static void registerAlarm(Context c,AlarmManager manager,boolean force,int id,String time){try{String[] h=time.split(":");int hour=Integer.parseInt(h[0]),minute=Integer.parseInt(h[1]);if(hour<0||hour>23||minute<0||minute>59)return;
