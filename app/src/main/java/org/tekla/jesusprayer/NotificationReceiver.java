@@ -28,7 +28,8 @@ public class NotificationReceiver extends BroadcastReceiver {
    int kind=intent.getIntExtra("kind",103);
    boolean agpeya=any(current,new String[]{"prime","third","sixth","ninth","sunset","sleep","midnight"});
    if(kind==105){if(settings.optBoolean("dailyVerse",true)&&!today.equals(c.getSharedPreferences("notety_data",Context.MODE_PRIVATE).getString("lastOpeningVerseNotice","")))send(c,"رسالة ربنا ليك النهارده †","آية ورسالة النهارده مستنياك في نوتتي الروحية.",801);return;}
-   if(kind==101||kind==102||kind==104){if(!settings.optBoolean("prayerReminders",true)||agpeya)return;
+   if(kind==101||kind==102||kind==104){if(!settings.optBoolean("prayerReminders",true))return;
+       String prayerKey=kind==101?"prime":kind==102?"sunset":"sleep";if(current.optBoolean(prayerKey))return;
        String key=kind==101?"notifyPrime":kind==102?"notifySunset":"notifySleep";
        if(!settings.optBoolean(key,true))return;
        String label=kind==101?"باكر":kind==102?"الغروب":"النوم";
@@ -53,8 +54,8 @@ public class NotificationReceiver extends BroadcastReceiver {
   }catch(Exception ignored){}
  }
  static boolean any(JSONObject o,String[] keys){for(String k:keys)if(o.optBoolean(k))return true;return false;}
- static String lastDate(JSONObject days,String key){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();if(date.compareTo(latest)>0&&days.optJSONObject(date)!=null&&days.optJSONObject(date).optBoolean(key))latest=date;}return latest;}
- static String lastAny(JSONObject days,String[] keys){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();JSONObject a=days.optJSONObject(date);if(a!=null&&any(a,keys)&&date.compareTo(latest)>0)latest=date;}return latest;}
+ static String lastDate(JSONObject days,String key){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();if(date.compareTo(new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date()))<=0&&date.compareTo(latest)>0&&days.optJSONObject(date)!=null&&days.optJSONObject(date).optBoolean(key))latest=date;}return latest;}
+ static String lastAny(JSONObject days,String[] keys){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();JSONObject a=days.optJSONObject(date);if(date.compareTo(new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date()))<=0&&a!=null&&any(a,keys)&&date.compareTo(latest)>0)latest=date;}return latest;}
  static Calendar parse(String d){Calendar c=Calendar.getInstance();String[] x=d.split("-");if(x.length==3){c.set(Integer.parseInt(x[0]),Integer.parseInt(x[1])-1,Integer.parseInt(x[2]),0,0,0);c.set(Calendar.MILLISECOND,0);}return c;}
  static int days(String a,String b){return (int)Math.round((parse(b).getTimeInMillis()-parse(a).getTimeInMillis())/86400000.0);}
  static void send(Context c,String title,String body,int id){try{if(Build.VERSION.SDK_INT>=33&&c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)return;
