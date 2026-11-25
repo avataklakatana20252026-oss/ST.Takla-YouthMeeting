@@ -112,3 +112,37 @@ body:has(main[data-screen=agpeya]) .topbrand strong{font-size:16px}
 body:has(main[data-screen=agpeya]) .topbrand span{display:none}
 
 #launchIntro{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at center,#78384b,#34101e 72%);pointer-events:auto}#launchIntro img{width:min(37vw,170px);aspect-ratio:1;border-radius:25%;position:relative;z-index:2;box-shadow:0 15px 70px #e6b56455;opacity:0;transform:scale(.65)}.launch-rays,.launch-orbit{position:absolute;width:min(85vw,360px);aspect-ratio:1;border-radius:50%;opacity:0}.launch-rays{background:conic-gradient(from 0deg,transparent,#e9bb7633,transparent,#e9bb7633,transparent);filter:blur(18px)}.launch-orbit{border:1px solid #e7c17b;box-shadow:0 0 35px #d9af6844,inset 0 0 35px #d9af6822}.launch-line{position:absolute;top:calc(50% + min(24vw,110px));height:2px;width:100px;background:linear-gradient(90deg,transparent,#e9c27d,transparent);opacity:0}.launch-play{animation:launchExit .42s 1.18s ease both}.launch-play img{animation:launchIcon 1.35s cubic-bezier(.2,.8,.2,1) both}.launch-play .launch-orbit{animation:launchOrbit 1.3s ease-out both}.launch-play .launch-rays{animation:launchRays 1.4s ease-out both}.launch-play .launch-line{animation:launchLine 1.2s ease both}@keyframes launchIcon{0%{opacity:0;transform:scale(.65)}35%{opacity:1;transform:scale(1.05)}65%{transform:scale(1)}100%{opacity:1;transform:scale(1.16)}}@keyframes launchOrbit{0%{opacity:0;transform:scale(.3)}40%{opacity:.8}100%{opacity:0;transform:scale(1.4)}}@keyframes launchRays{0%{opacity:0;transform:scale(.5) rotate(-30deg)}55%{opacity:1}100%{opacity:0;transform:scale(1.5) rotate(45deg)}}@keyframes launchLine{0%{opacity:0;transform:scaleX(0)}60%{opacity:1;transform:scaleX(1)}100%{opacity:0}}@keyframes launchExit{to{opacity:0;visibility:hidden;transform:scale(1.07)}}.agp-bookmarks{display:flex;gap:5px;flex-wrap:wrap;flex:none}.agp-bookmarks .btn{font-size:11px;min-height:32px;padding:4px 8px;flex:1}.agp-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--wine)}.agp-empty span{font-size:46px;color:var(--gold)}@media(prefers-reduced-motion:reduce){#launchIntro{display:none!important}}
+
+/* V21 — royal home only, real Arabic text */
+#app:has(main[data-screen="home"]){background:#260810}
+#app:has(main[data-screen="home"]) .topbar{height:48px;min-height:48px;background:#300a17;border:0;box-shadow:none;padding:5px 14px}
+#app:has(main[data-screen="home"]) .topbrand{visibility:hidden}
+#app:has(main[data-screen="home"]) .icon-btn{width:35px;height:35px;background:linear-gradient(145deg,#66182c,#310913);border:1px solid #d6ae65;color:#ffe5a3;border-radius:50%;box-shadow:none}
+main[data-screen="home"]{padding:0 12px 8px;background:radial-gradient(ellipse at 50% 15%,#68172c,#350b18 60%,#240810)}
+.royal-hero{position:relative;display:flex;align-items:center;min-height:206px;isolation:isolate;overflow:hidden;border:1px solid #e5bd72;border-radius:20px;background:#340a17;box-shadow:0 8px 24px #0004}
+.royal-hero img{position:absolute;left:0;top:0;height:100%;width:54%;object-fit:cover;object-position:center 53%;z-index:-2}
+.royal-hero:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(270deg,#320a16 38%,#320a16dd 47%,transparent 70%);pointer-events:none}
+.royal-copy{width:58%;text-align:center;padding:12px 9px;color:#fff7e7;display:flex;align-items:center;flex-direction:column;gap:5px}
+.royal-cross{font-size:25px;color:#f3d18c;line-height:1;text-shadow:0 0 14px #db9d49}
+.royal-copy h1{font-size:clamp(19px,5.3vw,29px);line-height:1.5;margin:0;color:#ffdf96;text-shadow:0 2px 3px #000;font-weight:800}
+.royal-rule{width:64%;height:1px;background:linear-gradient(90deg,transparent,#eac17a,transparent);margin:3px 0}
+.royal-copy h2{font-size:16px;margin:0;font-weight:700;color:#fff4df}
+.royal-copy p{font-size:11px;line-height:1.85;margin:0;color:#f2ddc6;font-weight:500}
+main[data-screen="home"] .feature-link{margin:12px 0 0;min-height:68px;background:linear-gradient(125deg,#edd3a5,#fff9ec 55%,#f7e7cb);border:1px solid #dfb86d;box-shadow:0 4px 0 #9e6d36,0 8px 15px #0003;border-radius:15px;padding:10px;gap:10px}
+main[data-screen="home"] .feature-symbol,main[data-screen="home"] .tile-icon{background:linear-gradient(145deg,#811c38,#390b18);color:#f9da91;border:1px solid #c9a05c;box-shadow:0 3px 6px #5b261c30;border-radius:12px;flex:none}
+main[data-screen="home"] .feature-link strong{font-size:15px;color:#4b101f}
+main[data-screen="home"] .section-label{text-align:center;color:#f6d99d;margin:15px 0 10px;font-size:15px}
+main[data-screen="home"] .section-label:before,main[data-screen="home"] .section-label:after{content:' — ';color:#c99d57}
+main[data-screen="home"] .modern-grid{gap:11px}
+main[data-screen="home"] .modern-grid .home-tile{background:linear-gradient(135deg,#fffaf0,#f0dfc3);border:1px solid #d9b36d;box-shadow:0 3px 0 #a67539,0 6px 12px #0003;color:#481020;min-height:72px;padding:9px 8px;border-radius:14px;gap:7px}
+main[data-screen="home"] .modern-grid .tile-copy{font-size:12px;font-weight:800;flex:1}
+main[data-screen="home"] .modern-grid .tile-copy small{color:#765344;font-size:10px}
+main[data-screen="home"] .modern-grid .tile-icon{width:37px;height:37px}
+main[data-screen="home"] .arrow{color:#91612e}
+main[data-screen="home"] .footer-note{color:#dfbf85;font-size:11px;margin:14px 0 3px}
+#app:has(main[data-screen="home"]) .bottom-nav{background:linear-gradient(180deg,#501124,#2a0813);border-top:1px solid #d9b36d;box-shadow:0 -3px 15px #0003;height:60px;min-height:60px}
+#app:has(main[data-screen="home"]) .bottom-nav button{color:#e5c68e}
+#app:has(main[data-screen="home"]) .bottom-nav button.active{color:#ffe8af}
+#app:has(main[data-screen="home"]) .bottom-nav button.active span{background:#81304a;border:1px solid #c69d59;color:#ffe7ad}
+@media(max-width:360px){.royal-hero{min-height:185px}.royal-copy h1{font-size:19px}.royal-copy p{font-size:10px}main[data-screen="home"] .modern-grid .tile-copy{font-size:11px}main[data-screen="home"] .modern-grid .tile-icon{width:31px;height:31px}}
+@media(min-height:800px){.royal-hero{min-height:250px}main[data-screen="home"] .modern-grid .home-tile{min-height:85px}}
