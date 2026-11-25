@@ -1,0 +1,7 @@
+V25 — التوقيع الدائم
+يستخدم GitHub Actions الأسرار NOTETY_KEYSTORE_BASE64 و NOTETY_KEYSTORE_PASSWORD و NOTETY_KEY_ALIAS.
+اسم المفتاح notety، وكلمة مرور المفتاح هي نفسها كلمة مرور المخزن.
+ارفع محتويات المشروع مع المجلد المخفي .github إلى main، ثم افتح Actions وشغّل Build Android APK.
+الملف الناتج Notety-ElRouhiya-v25-APK يحتوي app-release.apk.
+احتفظ بمفتاح JKS وكلمة المرور في مكان آمن. لا ترفع ملف JKS إلى المستودع.
+لا يمكن تحديث نسخة موقعة بمفتاح مختلف دون استعادة مفتاحها الأصلي. لا تحذف النسخة القديمة قبل حفظ البيانات.
