@@ -24,10 +24,10 @@ public class MainActivity extends Activity {
     private WebView web;
     public static final String CHANNEL="notety_daily";
     @Override public void onCreate(Bundle b){super.onCreate(b);
-        getWindow().setStatusBarColor(0xFFFAF7F2);getWindow().setNavigationBarColor(0xFFFAF7F2);
-        if(Build.VERSION.SDK_INT>=26){getWindow().getDecorView().setSystemUiVisibility(0x00002000|0x00000010);NotificationChannel c=new NotificationChannel(CHANNEL,"تذكيراتي الروحية",NotificationManager.IMPORTANCE_DEFAULT);c.setDescription("رسالة اليوم والتنبيهات الروحية");getSystemService(NotificationManager.class).createNotificationChannel(c);}
+        getWindow().setStatusBarColor(0xFF350A17);getWindow().setNavigationBarColor(0xFF350A17);
+        if(Build.VERSION.SDK_INT>=26){getWindow().getDecorView().setSystemUiVisibility(0);NotificationChannel c=new NotificationChannel(CHANNEL,"تذكيراتي الروحية",NotificationManager.IMPORTANCE_DEFAULT);c.setDescription("رسالة اليوم والتنبيهات الروحية");getSystemService(NotificationManager.class).createNotificationChannel(c);}
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},29);
-        web=new WebView(this);web.setBackgroundColor(0xFFFAF7F2);web.setWebViewClient(new WebViewClient(){@Override public void onPageFinished(WebView v,String url){super.onPageFinished(v,url);openFastIntent();}});web.setWebChromeClient(new WebChromeClient());
+        web=new WebView(this);web.setBackgroundColor(0xFF350A17);web.setWebViewClient(new WebViewClient(){@Override public void onPageFinished(WebView v,String url){super.onPageFinished(v,url);openFastIntent();}});web.setWebChromeClient(new WebChromeClient());
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(true);s.setAllowFileAccessFromFileURLs(true);s.setAllowUniversalAccessFromFileURLs(false);s.setDefaultTextEncodingName("UTF-8");s.setTextZoom(100);
         web.addJavascriptInterface(new Bridge(),"Android");setContentView(web);web.loadUrl("file:///android_asset/index.html");scheduleAll(this);
     }
