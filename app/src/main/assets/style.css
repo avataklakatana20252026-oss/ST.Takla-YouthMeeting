@@ -166,3 +166,6 @@ main[data-screen=bible]{display:flex;flex-direction:column;overflow:hidden;gap:6
 @media(max-width:350px){.royal-copy h1{font-size:18px}.royal-copy p{font-size:10px}.reader-selects .field{font-size:10px}}
 @media print{#app,main{background:white!important;color:black!important;height:auto!important;overflow:visible!important}.card,.reader-paper{background:white!important;color:black!important;box-shadow:none!important}.reader-paper .bible-text{color:black!important}}
 .card.night .eyebrow,.card.night .verse-source{color:#e8be78}.card .subtext,.card .label{color:#765d50}.prayer-toolbar .font-controls{flex-wrap:nowrap}.reading-surface.night{color:#f9ead5}.reader-paper.night .bible-text{color:#f9ead5}.report-line strong{color:#681b36}.fast-feature small{color:#765d50}
+
+/* V23 dedication */
+.royal-copy h2{font-size:clamp(13px,3.6vw,19px);line-height:1.85;text-wrap:balance;text-align:center}.royal-copy p{font-size:clamp(12px,3.4vw,16px);font-weight:600}.dedication-note{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;padding:10px 4px 14px}.dedication-note strong{font-size:14px;color:#efd095}.dedication-note small{font-size:11px;color:#d4b88b}
