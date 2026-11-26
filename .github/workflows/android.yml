@@ -19,6 +19,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Test local activity and report persistence
+        run: node tools/test_records.cjs
+      - name: Import and validate all 365 original annual-plan days
+        run: python3 tools/import_annual.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Annual-plan-audit
+          path: annual_audit.json
+          if-no-files-found: error
       - name: Restore persistent signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.NOTETY_KEYSTORE_BASE64 }}
@@ -43,7 +52,7 @@ jobs:
         run: '"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: Notety-ElRouhiya-v25-APK
+          name: Notety-ElRouhiya-v28-APK
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
       - name: Remove temporary signing key
