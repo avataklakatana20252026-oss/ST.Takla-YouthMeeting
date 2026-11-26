@@ -22,6 +22,9 @@ import java.util.Calendar;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private boolean checkingUpdate=false;
+    private static final String RELEASE_API="https://api.github.com/repos/avataklakatana20252026-oss/ST.Takla-YouthMeeting/releases/latest";
+    private static final String DOWNLOAD_PAGE="https://avataklakatana20252026-oss.github.io/ST.Takla-YouthMeeting/";
     public static final String CHANNEL="notety_daily";
     @Override public void onCreate(Bundle b){super.onCreate(b);
         getWindow().setStatusBarColor(0xFF350A17);getWindow().setNavigationBarColor(0xFF350A17);
@@ -30,10 +33,46 @@ public class MainActivity extends Activity {
         web=new WebView(this);web.setBackgroundColor(0xFF350A17);web.setWebViewClient(new WebViewClient(){@Override public void onPageFinished(WebView v,String url){super.onPageFinished(v,url);openFastIntent();}});web.setWebChromeClient(new WebChromeClient());
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(true);s.setAllowFileAccessFromFileURLs(true);s.setAllowUniversalAccessFromFileURLs(false);s.setDefaultTextEncodingName("UTF-8");s.setTextZoom(100);
         web.addJavascriptInterface(new Bridge(),"Android");setContentView(web);web.loadUrl("file:///android_asset/index.html");scheduleAll(this);
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(()->checkUpdate(false),4000);
     }
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);openFastIntent();}
     private void openFastIntent(){Intent i=getIntent();if(web==null||i==null)return;if(i.getBooleanExtra("annualNotice",false)){web.evaluateJavascript("if(typeof openAnnualNotice==='function'){openAnnualNotice();true}else{false}",result->{if("true".equals(result))i.removeExtra("annualNotice");});return;}String period=i.getStringExtra("fastPeriod"),date=i.getStringExtra("fastDate");if(period==null||date==null||!date.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")||!(period.equals("morning")||period.equals("evening")))return;web.evaluateJavascript("if(typeof openFastNotice==='function'){openFastNotice("+JSONObject.quote(date)+","+JSONObject.quote(period)+");true}else{false}",result->{if("true".equals(result)){i.removeExtra("fastPeriod");i.removeExtra("fastDate");}});}
+    private void checkUpdate(boolean manual){
+        if(isFinishing()||isDestroyed()||checkingUpdate)return;
+        android.content.SharedPreferences prefs=getSharedPreferences("notety_update",MODE_PRIVATE);
+        if(!manual && System.currentTimeMillis()-prefs.getLong("checked",0)<86400000L)return;
+        checkingUpdate=true;
+        new Thread(()->{
+            int available=0; boolean ok=false;
+            java.net.HttpURLConnection conn=null;
+            try{
+                conn=(java.net.HttpURLConnection)new java.net.URL(RELEASE_API).openConnection();
+                conn.setConnectTimeout(8000);conn.setReadTimeout(8000);conn.setInstanceFollowRedirects(false);
+                conn.setRequestProperty("Accept","application/vnd.github+json");conn.setRequestProperty("User-Agent","Notety-Android");
+                if(conn.getResponseCode()==200){
+                    java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+                    try(java.io.InputStream in=conn.getInputStream()){byte[] b=new byte[4096];int n;while((n=in.read(b))!=-1){bytes.write(b,0,n);if(bytes.size()>524288)throw new java.io.IOException("Large response");}}
+                    JSONObject release=new JSONObject(bytes.toString("UTF-8"));String tag=release.optString("tag_name");
+                    if(tag.matches("v[0-9]{1,8}")&&!release.optBoolean("draft")&&!release.optBoolean("prerelease")){
+                        available=Integer.parseInt(tag.substring(1));org.json.JSONArray assets=release.optJSONArray("assets");
+                        if(assets!=null)for(int j=0;j<assets.length();j++){JSONObject item=assets.optJSONObject(j);if(item!=null&&"notety.apk".equals(item.optString("name"))&&item.optLong("size")>0){ok=true;break;}}
+                    }
+                }
+            }catch(Exception ignored){}finally{if(conn!=null)conn.disconnect();}
+            final int latest=available;final boolean verified=ok;
+            runOnUiThread(()->{checkingUpdate=false;if(isFinishing()||isDestroyed())return;
+                if(!verified){if(manual)android.widget.Toast.makeText(this,"تعذر التحقق من وجود تحديث الآن. حاول لاحقًا.",android.widget.Toast.LENGTH_LONG).show();return;}
+                prefs.edit().putLong("checked",System.currentTimeMillis()).apply();
+                int current;try{current=getPackageManager().getPackageInfo(getPackageName(),0).versionCode;}catch(Exception ex){return;}
+                if(latest>current){new android.app.AlertDialog.Builder(this).setTitle("يتوفر تحديث جديد").setMessage("يتوفر إصدار أحدث من نوتتي الروحية ("+latest+"). حمّله من صفحة التطبيق الرسمية وثبّته فوق النسخة الحالية.").setPositiveButton("صفحة التحميل",(d,w)->openDownloadPage()).setNegativeButton("لاحقًا",null).show();}
+                else if(manual)android.widget.Toast.makeText(this,"أنت تستخدم أحدث إصدار متاح.",android.widget.Toast.LENGTH_LONG).show();
+            });
+        }).start();
+    }
+    private void openDownloadPage(){try{startActivity(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse(DOWNLOAD_PAGE)));}catch(Exception ignored){}}
     public class Bridge {
+        @JavascriptInterface public void checkForUpdate(){runOnUiThread(()->checkUpdate(true));}
+        @JavascriptInterface public void openOfficialDownload(){runOnUiThread(()->openDownloadPage());}
         @JavascriptInterface public void finishApp(){runOnUiThread(()->finish());}
         @JavascriptInterface public void syncData(String json){getSharedPreferences("notety_data",MODE_PRIVATE).edit().putString("state",json).apply();}
         @JavascriptInterface public void schedule(){runOnUiThread(()->scheduleAll(MainActivity.this));}
