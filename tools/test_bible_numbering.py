@@ -10,4 +10,6 @@ for k,b in BOOKS.items():
 assert parse_ref('متى 17:25-27')['ev']==27
 assert parse_ref('متى 21:31-32')['v']==31
 assert parse_ref('حزقيال 38:22-23')['ev']==23
+assert parse_ref('المزامير 150:1-6')['ev']==6
+assert parse_ref('المزامير 150:6-6')['v']==6
 print(f'PASS: {count} chapters, sequential verse numbers and regression references')
