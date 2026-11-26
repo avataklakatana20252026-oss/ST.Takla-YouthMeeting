@@ -1,0 +1,3 @@
+#app{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+input,select,textarea{font-size:16px!important}
+@media print{html,body,#app,#view{height:auto!important;overflow:visible!important}.topbar,.bottom-nav,.no-print,#launchIntro{display:none!important}body,#app,#view{background:#fff!important;color:#111!important}}
