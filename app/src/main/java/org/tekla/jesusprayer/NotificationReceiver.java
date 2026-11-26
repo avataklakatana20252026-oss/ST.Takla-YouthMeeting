@@ -27,6 +27,7 @@ public class NotificationReceiver extends BroadcastReceiver {
    JSONObject current=acts.optJSONObject(today);if(current==null)current=new JSONObject();
    int kind=intent.getIntExtra("kind",103);
    if(kind==106||kind==107){if(settings.optBoolean("fastReminder",true))fastNotice(c,today,kind);return;}
+   if(kind==108){if(settings.optBoolean("annualReminder",true))annualNotice(c,state,today);return;}
    boolean agpeya=any(current,new String[]{"prime","third","sixth","ninth","sunset","sleep","midnight"});
    if(kind==105){if(settings.optBoolean("dailyVerse",true)&&!today.equals(c.getSharedPreferences("notety_data",Context.MODE_PRIVATE).getString("lastOpeningVerseNotice","")))send(c,"رسالة ربنا ليك النهارده †","آية ورسالة النهارده مستنياك في نوتتي الروحية.",801);return;}
    if(kind==101||kind==102||kind==104){if(!settings.optBoolean("prayerReminders",true))return;
@@ -58,9 +59,23 @@ public class NotificationReceiver extends BroadcastReceiver {
   String period=kind==106?"morning":"evening";
   java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
   try(java.io.InputStream in=c.getAssets().open("fast_notifications.json")){byte[] buffer=new byte[4096];int n;while((n=in.read(buffer))!=-1)bytes.write(buffer,0,n);}
-  JSONObject row=new JSONObject(bytes.toString("UTF-8")).optJSONObject(date);if(row==null)return;
+  String md=date.substring(5);String template=(md.startsWith("01-")?"2027-":"2026-")+md;
+  JSONObject row=new JSONObject(bytes.toString("UTF-8")).optJSONObject(template);if(row==null)return;
+  JSONObject state=new JSONObject(c.getSharedPreferences("notety_data",Context.MODE_PRIVATE).getString("state","{}"));JSONObject marks=state.optJSONObject("nativityDone");if(marks!=null&&marks.optBoolean(date+"-"+period))return;
   String body=row.getString(period+"Message")+"\nقراءة اليوم: "+row.getString(period);
   send(c,kind==106?"صوم الميلاد | قراءة الصباح":"صوم الميلاد | قراءة المساء",body,kind==106?906:907,date,period);
+ }
+ static void annualNotice(Context c,JSONObject state,String today)throws Exception{
+  String start=state.optString("annualStartDate","");if(!start.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}"))return;
+  int elapsed=days(start,today);if(elapsed<0)return;
+  JSONObject marks=state.optJSONObject("annualBibleDone");if(marks==null)marks=new JSONObject();
+  int target=0;for(int n=1;n<=Math.min(365,elapsed+1);n++){if(!marks.optBoolean(n+"-1")||!marks.optBoolean(n+"-2")||!marks.optBoolean(n+"-3")){target=n;break;}}
+  if(target==0)return;
+  java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();try(java.io.InputStream in=c.getAssets().open("annual_plan.js")){byte[] buffer=new byte[4096];int n;while((n=in.read(buffer))!=-1)bytes.write(buffer,0,n);}
+  String text=bytes.toString("UTF-8");int a=text.indexOf('{'),b=text.lastIndexOf('}');if(a<0||b<a)return;
+  org.json.JSONArray row=new JSONObject(text.substring(a,b+1)).optJSONArray(String.valueOf(target));if(row==null||row.length()!=3)return;
+  StringBuilder body=new StringBuilder("اليوم "+target);for(int i=0;i<3;i++)if(!marks.optBoolean(target+"-"+(i+1)))body.append("\n").append(row.getJSONObject(i).getString("label"));
+  send(c,"الكتاب المقدس في عام †",body.toString(),908,null,"annual");
  }
  static boolean any(JSONObject o,String[] keys){for(String k:keys)if(o.optBoolean(k))return true;return false;}
  static String lastDate(JSONObject days,String key){String latest="";Iterator<String> it=days.keys();while(it.hasNext()){String date=it.next();if(date.compareTo(new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date()))<=0&&date.compareTo(latest)>0&&days.optJSONObject(date)!=null&&days.optJSONObject(date).optBoolean(key))latest=date;}return latest;}
@@ -69,7 +84,7 @@ public class NotificationReceiver extends BroadcastReceiver {
  static int days(String a,String b){return (int)Math.round((parse(b).getTimeInMillis()-parse(a).getTimeInMillis())/86400000.0);}
  static void send(Context c,String title,String body,int id){send(c,title,body,id,null,null);}
  static void send(Context c,String title,String body,int id,String date,String period){try{if(Build.VERSION.SDK_INT>=33&&c.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)return;
-  Intent open=new Intent(c,MainActivity.class);if(period!=null){open.putExtra("fastPeriod",period);open.putExtra("fastDate",date);}open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);PendingIntent pi=PendingIntent.getActivity(c,id,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+  Intent open=new Intent(c,MainActivity.class);if("annual".equals(period)){open.putExtra("annualNotice",true);}else if(period!=null){open.putExtra("fastPeriod",period);open.putExtra("fastDate",date);}open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);PendingIntent pi=PendingIntent.getActivity(c,id,open,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
   Notification.Builder b=Build.VERSION.SDK_INT>=26?new Notification.Builder(c,MainActivity.CHANNEL):new Notification.Builder(c);
   b.setSmallIcon(R.drawable.ic_notification).setContentTitle(title).setContentText(body).setStyle(new Notification.BigTextStyle().bigText(body)).setContentIntent(pi).setAutoCancel(true).setWhen(System.currentTimeMillis());
   ((NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE)).notify(id,b.build());
