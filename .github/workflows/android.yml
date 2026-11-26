@@ -21,6 +21,8 @@ jobs:
           gradle-version: '8.9'
       - name: Test local activity and report persistence
         run: node tools/test_records.cjs
+      - name: Validate all local Bible verse numbers
+        run: python3 tools/test_bible_numbering.py
       - name: Import and validate all 365 original annual-plan days
         run: python3 tools/import_annual.py
       - uses: actions/upload-artifact@v4
@@ -52,7 +54,7 @@ jobs:
         run: '"$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs app/build/outputs/apk/release/app-release.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: Notety-ElRouhiya-v28-APK
+          name: Notety-ElRouhiya-v29-APK
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
       - name: Remove temporary signing key
